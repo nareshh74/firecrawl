@@ -1,0 +1,38 @@
+services:
+  playwright-service:
+    restart: unless-stopped
+
+  searxng:
+    image: searxng/searxng:latest
+    restart: unless-stopped
+    networks:
+      - backend
+    ports:
+      - "${SEARXNG_PORT:-8888}:8080"
+    volumes:
+      - ./searxng/config:/etc/searxng
+      - searxng-cache:/var/cache/searxng
+    environment:
+      SEARXNG_SECRET: ${SEARXNG_SECRET:-firecrawl-local-searxng-change-me}
+      SEARXNG_BASE_URL: ${SEARXNG_BASE_URL:-http://localhost:8888/}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+        compress: "true"
+
+  redis:
+    restart: unless-stopped
+
+  rabbitmq:
+    restart: unless-stopped
+
+  nuq-postgres:
+    restart: unless-stopped
+
+  foundationdb:
+    restart: unless-stopped
+
+volumes:
+  searxng-cache:
